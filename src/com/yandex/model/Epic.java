@@ -1,7 +1,10 @@
+package com.yandex.model;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private ArrayList<Integer> subtasksId = new ArrayList<>();
+    private final ArrayList<Integer> subtasksId = new ArrayList<>();
+
     public Epic(String name, String description) {
         super(name, description);
     }
@@ -28,7 +31,8 @@ public class Epic extends Task {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status=" + status +
+                ", status='" + status + '\'' +
+                ", subtaskId=" + subtasksId +
                 '}';
     }
 }

@@ -1,3 +1,11 @@
+package com.yandex;
+
+import com.yandex.model.Epic;
+import com.yandex.model.Subtask;
+import com.yandex.model.Task;
+import com.yandex.model.TaskStatus;
+import com.yandex.service.TaskManager;
+
 public class Main {
 
     public static void main(String[] args) {

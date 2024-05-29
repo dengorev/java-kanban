@@ -1,3 +1,7 @@
+package com.yandex.model;
+
+import com.yandex.model.TaskStatus;
+
 public class Task {
     protected int id;
     protected String name;
@@ -9,7 +13,6 @@ public class Task {
         this.description = description;
         this.status = TaskStatus.NEW;
     }
-
 
 
     public int getId() {

@@ -1,3 +1,5 @@
+package com.yandex.model;
+
 public class Subtask extends Task{
     private int epicId;
     public Subtask(String name, String description, int epicId) {
@@ -16,7 +18,7 @@ public class Subtask extends Task{
     @Override
     public String toString() {
         return "Epic id "  + epicId +
-                " :Subtask{" +
+                ": Subtask{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
