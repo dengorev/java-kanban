@@ -32,7 +32,7 @@ public class Epic extends Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
-                ", subtaskId=" + subtasksId +
+                ", subtaskId=" + getSubtasksId() +
                 '}';
     }
 }

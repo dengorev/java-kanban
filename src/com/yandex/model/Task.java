@@ -1,7 +1,5 @@
 package com.yandex.model;
 
-import com.yandex.model.TaskStatus;
-
 public class Task {
     protected int id;
     protected String name;

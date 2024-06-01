@@ -25,6 +25,7 @@ public class TaskManager {
     public Epic createEpic(Epic epic) {
         int id = idGenerator();
         epic.setId(id);
+        updateEpicStatus(epic);
         epicStorage.put(id, epic);
         return epic;
     }
@@ -38,7 +39,7 @@ public class TaskManager {
             System.out.println("Epic с таким id не существует");
         }
         epic.addSubtaskId(id);
-        updateEpic(epic);
+        updateEpicStatus(epic);
         return subtask;
     }
 
@@ -56,8 +57,6 @@ public class TaskManager {
 
     public void deleteAllTask() {
         taskStorage.clear();
-        epicStorage.clear();
-        subtaskStorage.clear();
     }
 
     public void deleteAllEpic() {
@@ -74,24 +73,16 @@ public class TaskManager {
     }
 
     public Task getTaskById(int id) {
-        if (taskStorage.containsKey(id)) {
-            return taskStorage.get(id);
-        }
-        return null;
+        return taskStorage.get(id);
     }
 
     public Epic getEpicById(int id) {
-        if (epicStorage.containsKey(id)) {
-            return epicStorage.get(id);
-        }
-        return null;
+        return epicStorage.get(id);
     }
 
     public Subtask getSubtaskById(int id) {
-        if (subtaskStorage.containsKey(id)) {
-            return subtaskStorage.get(id);
-        }
-        return null;
+        return subtaskStorage.get(id);
+
     }
 
     public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
@@ -110,11 +101,12 @@ public class TaskManager {
 
     public void removeEpicById(int id) {
         Epic epic = epicStorage.get(id);
-        for (Integer subtaskIds : epic.getSubtasksId()) {
-            subtaskStorage.remove(subtaskIds);
-            epic.deleteSubtaskId(subtaskIds);
-        }
         epicStorage.remove(id);
+        for (Integer subtaskIds : epic.getSubtasksId()) {
+            epic.getSubtasksId().remove(subtaskStorage.get(subtaskIds));
+            subtaskStorage.remove(subtaskIds);
+
+        }
     }
 
     public void removeSubtaskById(int id) {
@@ -140,48 +132,46 @@ public class TaskManager {
 
     public Subtask updateSubtask(Subtask subtask) {
         Subtask saved = subtaskStorage.get(subtask.getId());
+        Epic epic = epicStorage.get(subtask.getEpicId());
         if (saved == null) {
             return null;
-        } else if (saved.getStatus() != TaskStatus.DONE) {
-            statusInProgress(saved);
-        } else {
-            statusToDone(saved);
         }
+        updateEpicStatus(epic);
         return subtaskStorage.put(subtask.getId(), subtask);
     }
 
-    private void statusInProgress(Subtask subtask) {
-        Epic epic = epicStorage.get(subtask.getEpicId());
-        Subtask saved = subtaskStorage.get(subtask.getId());
-        saved.setStatus(TaskStatus.IN_PROGRESS);
-        epic.setStatus(TaskStatus.IN_PROGRESS);
-        subtaskStorage.put(subtask.getId(), saved);
-        epicStorage.put(epic.getId(), epic);
-    }
+    private void updateEpicStatus(Epic epic) {
+        boolean isInProgress = false;
+        boolean isDone = false;
+        boolean isNew = false;
 
-    private void statusToDone(Subtask subtask) {
-        Epic epic = epicStorage.get(subtask.getEpicId());
-        Subtask saved = subtaskStorage.get(subtask.getId());
-        saved.setStatus(TaskStatus.DONE);
-        subtaskStorage.put(subtask.getId(), saved);
+        if (epic.getSubtasksId().isEmpty()) {
+            epic.setStatus(TaskStatus.NEW);
+            return;
+        }
 
-        boolean allSubtaskDone = true;
         for (Integer id : epic.getSubtasksId()) {
-            Subtask subtaskId = subtaskStorage.get(id);
-            if (subtaskId.getStatus() != TaskStatus.DONE) {
-                allSubtaskDone = false;
+            if (subtaskStorage.get(id).getStatus() == TaskStatus.IN_PROGRESS) {
+                isInProgress = true;
             }
-
-            if (allSubtaskDone) {
-                epic.setStatus(TaskStatus.DONE);
-                epicStorage.put(epic.getId(), epic);
+            if (subtaskStorage.get(id).getStatus() == TaskStatus.DONE) {
+                isDone = true;
+            }
+            if (subtaskStorage.get(id).getStatus() == TaskStatus.NEW) {
+                isNew = true;
             }
         }
 
+        if (isNew && !isDone && !isInProgress) {
+            epic.setStatus(TaskStatus.NEW);
+        } else if (isDone && !isNew && !isInProgress) {
+            epic.setStatus(TaskStatus.DONE);
+        } else {
+            epic.setStatus(TaskStatus.IN_PROGRESS);
+        }
     }
 
     private int idGenerator() {
         return ++idGenerated;
     }
-
 }
