@@ -4,13 +4,14 @@ import com.yandex.model.Epic;
 import com.yandex.model.Subtask;
 import com.yandex.model.Task;
 import com.yandex.model.TaskStatus;
+import com.yandex.service.HistoryManager;
 import com.yandex.service.TaskManager;
 
 public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
         Task task = new Task("task1", "zadacha1");
         Task task1 = new Task("task2", "zadacha2");
 
@@ -42,7 +43,6 @@ public class Main {
         task.setName("updateName");
         taskManager.updateTask(task);
         taskManager.updateEpic(epic);
-        taskManager.updateSubtask(subtask);
 
         System.out.println();
 
@@ -60,15 +60,21 @@ public class Main {
         System.out.println(taskManager.getAllEpic());
         System.out.println(taskManager.getAllSubtask());
 
-        taskManager.removeTaskById(1);
-        taskManager.removeEpicById(4);
-
         System.out.println();
 
         System.out.println(taskManager.getAllTask());
         System.out.println(taskManager.getAllEpic());
         System.out.println(taskManager.getAllSubtask());
 
+        taskManager.getTaskById(1);
+        taskManager.getTaskById(1);
+        taskManager.getSubtaskById(6);
+        taskManager.getTaskById(9999);
+        taskManager.getTaskById(2);
+
+        System.out.println();
+
+        System.out.println(taskManager.getHistory());
     }
 }
 
