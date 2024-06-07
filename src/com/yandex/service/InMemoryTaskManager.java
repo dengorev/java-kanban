@@ -1,6 +1,5 @@
 package com.yandex.service;
 
-import com.yandex.Managers;
 import com.yandex.model.Epic;
 import com.yandex.model.Subtask;
 import com.yandex.model.Task;
@@ -99,7 +98,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         Task task = taskStorage.get(id);
-        if (taskStorage.containsKey(id)) {
+        if (task != null) {
             historyManager.add(task);
             return task;
         }
@@ -109,7 +108,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpicById(int id) {
         Epic epic = epicStorage.get(id);
-        if (epicStorage.containsKey(id)) {
+        if (epic != null) {
             historyManager.add(epic);
             return epic;
         }
@@ -119,7 +118,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask getSubtaskById(int id) {
         Subtask subtask = subtaskStorage.get(id);
-        if (subtaskStorage.containsKey(id)) {
+        if (subtask != null) {
             historyManager.add(subtask);
             return subtask;
         }

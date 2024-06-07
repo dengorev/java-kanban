@@ -4,7 +4,7 @@ import com.yandex.model.Epic;
 import com.yandex.model.Subtask;
 import com.yandex.model.Task;
 import com.yandex.model.TaskStatus;
-import com.yandex.service.HistoryManager;
+import com.yandex.service.Managers;
 import com.yandex.service.TaskManager;
 
 public class Main {
@@ -66,11 +66,19 @@ public class Main {
         System.out.println(taskManager.getAllEpic());
         System.out.println(taskManager.getAllSubtask());
 
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getSubtaskById(6);
-        taskManager.getTaskById(9999);
-        taskManager.getTaskById(2);
+        taskManager.getTaskById(task.getId());
+        taskManager.getTaskById(task.getId());
+        taskManager.getSubtaskById(subtask2.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
 
         System.out.println();
 
