@@ -2,26 +2,81 @@ package com.yandex.service;
 
 import com.yandex.model.Task;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static final int MAX_SIZE = 9;
-    private final List<Task> tasks = new LinkedList<>();
+    private final Map<Integer, Node> nodeMap = new HashMap<>();
+    private Node first;
+    private Node last;
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(tasks);
+        List<Task> tasks = new ArrayList<>();
+        if (first == null) {
+            return  tasks;
+        }
+        Node current = first;
+
+        while (current != null) {
+            tasks.add(current.value);
+            current = current.next;
+        }
+        return tasks;
+    }
+
+    private Node linkLast(Task task) {
+        Node node = new Node(task);
+        if (first != null) {
+            last.next = node;
+            node.prev = last;
+        } else {
+            first = node;
+        }
+        last = node;
+        return node;
     }
 
     @Override
     public void add(Task task) {
-        if (tasks.size() <= MAX_SIZE) {
-            tasks.add(task);
+        Node node = linkLast(task);
+        if (nodeMap.containsKey(task.getId())) {
+            remove(task.getId());
+        }
+        nodeMap.put(task.getId(), node);
+    }
+
+    @Override
+    public void remove(int id) {
+        Node node = nodeMap.get(id);
+        removeNode(node);
+        nodeMap.remove(id);
+    }
+
+    private void removeNode(Node node) {
+        if (!nodeMap.containsValue(node)) {
+            return;
+        }
+        if (node == first) {
+            node.next.prev = null;
+            first = node.next;
+            node.next = null;
+        } else if (node == last) {
+            node.prev.next = null;
+            last = node.prev;
+            node.prev = null;
         } else {
-            tasks.removeFirst();
-            tasks.add(task);
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
+        }
+    }
+
+    private static class Node {
+        Node prev;
+        Node next;
+        Task value;
+
+        public Node(Task value) {
+            this.value = value;
         }
     }
 }
