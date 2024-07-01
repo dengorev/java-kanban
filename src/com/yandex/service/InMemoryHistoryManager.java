@@ -1,5 +1,6 @@
 package com.yandex.service;
 
+import com.yandex.model.Node;
 import com.yandex.model.Task;
 
 import java.util.*;
@@ -13,13 +14,13 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getHistory() {
         List<Task> tasks = new ArrayList<>();
         if (first == null) {
-            return  tasks;
+            return tasks;
         }
         Node current = first;
 
         while (current != null) {
-            tasks.add(current.value);
-            current = current.next;
+            tasks.add(current.getValue());
+            current = current.getNext();
         }
         return tasks;
     }
@@ -27,8 +28,8 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node linkLast(Task task) {
         Node node = new Node(task);
         if (first != null) {
-            last.next = node;
-            node.prev = last;
+            last.setNext(node);
+            node.setPrev(last);
         } else {
             first = node;
         }
@@ -57,26 +58,16 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
         if (node == first) {
-            node.next.prev = null;
-            first = node.next;
-            node.next = null;
+            node.getNext().setPrev(null);
+            first = node.getNext();
+            node.setNext(null);
         } else if (node == last) {
-            node.prev.next = null;
-            last = node.prev;
-            node.prev = null;
+            node.getPrev().setNext(null);
+            last = node.getPrev();
+            node.setPrev(null);
         } else {
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
-        }
-    }
-
-    private static class Node {
-        Node prev;
-        Node next;
-        Task value;
-
-        public Node(Task value) {
-            this.value = value;
+            node.getPrev().setNext(node.getNext());
+            node.getNext().setPrev(node.getPrev());
         }
     }
 }

@@ -2,19 +2,25 @@ package com.yandex.service;
 
 import com.yandex.model.Task;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 class InMemoryHistoryManagerTest {
-    private final InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
-    private final InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
+    private final HistoryManager inMemoryHistoryManager = Managers.getDefaultHistory();
+    private final TaskManager inMemoryTaskManager = Managers.getDefault();
+    private Task task;
+    private Task task2;
+
+    @BeforeEach
+    void init() {
+        task = new Task("задача1", "описание1");
+        task2 = new Task("задача2", "описание2");
+    }
 
     @Test
     void add_shouldAddTasksInHistoryWithoutDuplicates_whenCalled() {
-        Task task = new Task("задача1", "описание1");
-        Task task2 = new Task("задача2", "описание2");
-
         inMemoryTaskManager.createTask(task);
         inMemoryTaskManager.createTask(task2);
 
@@ -33,8 +39,6 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void remove_shouldRemoveTaskFromHistory_whenTaskExist() {
-        Task task = new Task("задача1", "описание1");
-        Task task2 = new Task("задача2", "описание2");
         Task task3 = new Task("задача3", "описание3");
         Task task4 = new Task("задача4", "описание4");
         Task task5 = new Task("задача5", "описание5");
