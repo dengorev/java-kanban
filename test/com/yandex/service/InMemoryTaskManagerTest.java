@@ -4,16 +4,24 @@ import com.yandex.model.Epic;
 import com.yandex.model.Subtask;
 import com.yandex.model.Task;
 import com.yandex.model.TaskStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
-    private final InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
+    private final TaskManager inMemoryTaskManager = Managers.getDefault();
+    private Task task;
+    private Epic epic;
+
+    @BeforeEach
+    void init() {
+        task = new Task("задача1", "описание1");
+        epic = new Epic("эпик1", "описаниеЭпика1");
+    }
 
     @Test
-    void addNewTask() {
-        Task task = new Task("задача1", "описание1");
+    void createTask_shouldCreateNewTask_whenCalled() {
         inMemoryTaskManager.createTask(task);
         int taskId = task.getId();
 
@@ -24,8 +32,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void addNewSubtask() {
-        Epic epic = new Epic("эпик1", "описаниеЭпика1");
+    void createSubtask_shouldCreateNewSubtask_whenCalled() {
         inMemoryTaskManager.createEpic(epic);
         Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
@@ -38,8 +45,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void addNewEpic() {
-        Epic epic = new Epic("эпик1", "описаниеЭпика1");
+    void createEpic_shouldCreateNewEpic_whenCalled() {
         inMemoryTaskManager.createEpic(epic);
 
         int epicId = epic.getId();
@@ -50,61 +56,68 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void addEpicInEpicAsSubtask() {
-        Epic epic = new Epic("эпик1", "описаниеЭпика1");
+    void addSubtaskId_shouldNotAddSubtaskInEpic_whenSubtaskIsEpic() {
         inMemoryTaskManager.createEpic(epic);
         epic.addSubtaskId(epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
 
         assertTrue(epic.getSubtasksId().isEmpty());
 
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask);
         epic.addSubtaskId(subtask.getId());
 
         assertFalse(epic.getSubtasksId().isEmpty());
     }
 
     @Test
-    public void SubtaskDoEpic() {
-        Epic epic = new Epic("эпик1", "описаниеЭпика1");
+    void createSubtask_shouldNotCreateSubtask_whenSubtaskEpicIdEqualSubtaskId() {
         inMemoryTaskManager.createEpic(epic);
         Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask);
         Subtask badSubtask = new Subtask("подзадача2", "описаниеПодзадачи2", subtask.getId());
         inMemoryTaskManager.createSubtask(badSubtask);
 
-        assertTrue(inMemoryTaskManager.getAllSubtask().isEmpty());
-        inMemoryTaskManager.createSubtask(subtask);
         assertEquals(1, inMemoryTaskManager.getAllSubtask().size());
+        assertEquals(subtask, inMemoryTaskManager.getAllSubtask().getFirst());
     }
 
     @Test
-    void utilClassReturnTaskManager() {
+    void getDefault_shouldReturnInMemoryTaskManager_whenCalled() {
         TaskManager taskManager = Managers.getDefault();
-        assertTrue(taskManager instanceof InMemoryTaskManager);
+        assertInstanceOf(InMemoryTaskManager.class, taskManager);
     }
 
     @Test
-    void utilClassgReturnHistoryManager() {
+    void getDefaultHistory_shouldReturnInMemoryHistoryManager_whenCalled() {
         HistoryManager historyManager = Managers.getDefaultHistory();
-        assertTrue(historyManager instanceof InMemoryHistoryManager);
+        assertInstanceOf(InMemoryHistoryManager.class, historyManager);
     }
 
     @Test
-    void addAllTypeTasksAndFind() {
-        Task task = new Task("задача1", "описание1");
+    void getTaskById_shouldReturnCreatedTask_whenTaskExist() {
         inMemoryTaskManager.createTask(task);
-        Epic epic = new Epic("эпик1", "описаниеЭпика1");
+
+        assertEquals(task, inMemoryTaskManager.getTaskById(1));
+    }
+
+    @Test
+    void getEpicById_shouldReturnCreatedEpic_whenEpicExist() {
+        inMemoryTaskManager.createEpic(epic);
+
+        assertEquals(epic, inMemoryTaskManager.getEpicById(1));
+    }
+
+    @Test
+    void getSubtaskById_shouldReturnCreatedSubtask_whenSubtaskExist() {
         inMemoryTaskManager.createEpic(epic);
         Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
-        assertEquals(task, inMemoryTaskManager.getTaskById(1));
-        assertEquals(epic, inMemoryTaskManager.getEpicById(2));
-        assertEquals(subtask, inMemoryTaskManager.getSubtaskById(3));
+        assertEquals(subtask, inMemoryTaskManager.getSubtaskById(2));
     }
 
     @Test
-    void idTest() {
-        Task task = new Task("задача1", "описание1");
+    void getTaskById_shouldReturnInitialTask_whenTaskIdModifiedBeforeCreate() {
         task.setId(99);
         inMemoryTaskManager.createTask(task);
 
@@ -112,8 +125,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void unchangedTaskWhenAdding() {
-        Task task = new Task("задача1", "описание1");
+    void createTask_shouldCreateTaskWithoutChanges_whenCalled() {
         inMemoryTaskManager.createTask(task);
 
         assertEquals(1, task.getId());
@@ -123,8 +135,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void unchangedEpicWhenAdding() {
-        Epic epic = new Epic("эпик1", "описаниеЭпика1");
+    void createEpic_shouldCreateEpicWithoutChanges_whenCalled() {
         inMemoryTaskManager.createTask(epic);
 
         assertEquals(1, epic.getId());
@@ -134,8 +145,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void unchangedSubtaskWhenAdding() {
-        Epic epic = new Epic("эпик1", "описаниеЭпика1");
+    void createSubtask_shouldCreateSubtaskWithoutChanges_whenCalled() {
         inMemoryTaskManager.createEpic(epic);
         Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
@@ -144,6 +154,86 @@ class InMemoryTaskManagerTest {
         assertEquals("подзадача1", subtask.getName());
         assertEquals("описаниеПодзадачи1", subtask.getDescription());
         assertEquals(TaskStatus.NEW, subtask.getStatus());
+    }
+
+    @Test
+    void createSubtask_shouldCreateSubtaskWithIdNotEqualsDeleted_whenCalled() {
+        inMemoryTaskManager.createEpic(epic);
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask);
+
+        int taskId = subtask.getId();
+        inMemoryTaskManager.removeSubtaskById(subtask.getId());
+
+        Subtask subtask2 = new Subtask("подзадача2", "описаниеПодзадачи2", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask);
+
+        assertNotEquals(taskId, subtask2.getId());
+    }
+
+    @Test
+    void removeSubtaskById_shouldRemoveSubtaskIdFromEpicSubtasks_whenSubtaskIsExistAndSubtaskIsEpicSubtask() {
+        inMemoryTaskManager.createEpic(epic);
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask);
+        Subtask subtask2 = new Subtask("подзадача2", "описаниеПодзадачи2", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask2);
+
+        assertEquals(subtask.getEpicId(), epic.getId());
+        assertEquals(subtask2.getEpicId(), epic.getId());
+
+        inMemoryTaskManager.removeSubtaskById(subtask2.getId());
+
+        assertEquals(1, epic.getSubtasksId().size());
+        assertEquals(subtask.getId(), epic.getSubtasksId().getFirst());
+    }
+
+    @Test
+    void setName_shouldChangeName_whenCalled() {
+        inMemoryTaskManager.createTask(task);
+        inMemoryTaskManager.createEpic(epic);
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask);
+
+        task.setName("задача5");
+        epic.setName("задача6");
+        subtask.setName("задача7");
+
+        assertEquals("задача5", inMemoryTaskManager.getTaskById(task.getId()).getName());
+        assertEquals("задача6", inMemoryTaskManager.getEpicById(epic.getId()).getName());
+        assertEquals("задача7", inMemoryTaskManager.getSubtaskById(subtask.getId()).getName());
+    }
+
+    @Test
+    void setDescription_shouldChangeName_whenCalled() {
+        inMemoryTaskManager.createTask(task);
+        inMemoryTaskManager.createEpic(epic);
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask);
+
+        task.setDescription("описание5");
+        epic.setDescription("описание6");
+        subtask.setDescription("описание7");
+
+        assertEquals("описание5", inMemoryTaskManager.getTaskById(task.getId()).getDescription());
+        assertEquals("описание6", inMemoryTaskManager.getEpicById(epic.getId()).getDescription());
+        assertEquals("описание7", inMemoryTaskManager.getSubtaskById(subtask.getId()).getDescription());
+    }
+
+    @Test
+    void setStatus_shouldChangeName_whenCalled() {
+        inMemoryTaskManager.createTask(task);
+        inMemoryTaskManager.createEpic(epic);
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        inMemoryTaskManager.createSubtask(subtask);
+
+        task.setStatus(TaskStatus.IN_PROGRESS);
+        epic.setStatus(TaskStatus.IN_PROGRESS);
+        subtask.setStatus(TaskStatus.IN_PROGRESS);
+
+        assertEquals(TaskStatus.IN_PROGRESS, inMemoryTaskManager.getTaskById(task.getId()).getStatus());
+        assertEquals(TaskStatus.IN_PROGRESS, inMemoryTaskManager.getEpicById(epic.getId()).getStatus());
+        assertEquals(TaskStatus.IN_PROGRESS, inMemoryTaskManager.getSubtaskById(subtask.getId()).getStatus());
     }
 }
 

@@ -13,10 +13,10 @@ public class Main {
         System.out.println("Поехали!");
         TaskManager taskManager = Managers.getDefault();
         Task task = new Task("task1", "zadacha1");
-        Task task1 = new Task("task2", "zadacha2");
+        Task task2 = new Task("task2", "zadacha2");
 
         taskManager.createTask(task);
-        taskManager.createTask(task1);
+        taskManager.createTask(task2);
 
         Epic epic = new Epic("epic1", "epic1");
         Epic epic2 = new Epic("epic2", "epic2");
@@ -69,16 +69,8 @@ public class Main {
         taskManager.getTaskById(task.getId());
         taskManager.getTaskById(task.getId());
         taskManager.getSubtaskById(subtask2.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task1.getId());
+        taskManager.getSubtaskById(subtask2.getId());
+        taskManager.getTaskById(task2.getId());
 
         System.out.println();
 
