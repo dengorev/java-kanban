@@ -65,7 +65,6 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicStatus(epic);
             return subtask;
         }
-
         System.out.println("Epic с таким id не существует");
         return null;
     }
