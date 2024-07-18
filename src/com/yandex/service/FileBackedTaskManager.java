@@ -93,20 +93,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public ArrayList<Task> getAllTask() {
-        ArrayList<Task> getAllTask = super.getAllTask();
-        return getAllTask;
+        return super.getAllTask();
     }
 
     @Override
     public ArrayList<Epic> getAllEpic() {
-        ArrayList<Epic> getAllEpic = super.getAllEpic();
-        return getAllEpic;
+        return super.getAllEpic();
     }
 
     @Override
     public ArrayList<Subtask> getAllSubtask() {
-        ArrayList<Subtask> getAllSubtask = super.getAllSubtask();
-        return getAllSubtask;
+        return super.getAllSubtask();
     }
 
     @Override
@@ -129,26 +126,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public Task getTaskById(int id) {
-        Task getTask = super.getTaskById(id);
-        return getTask;
+         return super.getTaskById(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        Epic getEpic = super.getEpicById(id);
-        return getEpic;
+        return super.getEpicById(id);
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
-        Subtask getSubtask = super.getSubtaskById(id);
-        return getSubtask;
+        return super.getSubtaskById(id);
     }
 
     @Override
     public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
-        ArrayList<Subtask> getSubtaskByEpicId = super.getSubtaskByEpicId(epicId);
-        return getSubtaskByEpicId;
+        return super.getSubtaskByEpicId(epicId);
     }
 
     @Override
