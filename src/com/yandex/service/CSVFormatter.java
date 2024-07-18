@@ -7,6 +7,7 @@ public class CSVFormatter {
     private CSVFormatter() {
 
     }
+
     public static String toString(Task task) {
         String result = new StringBuilder()
                 .append(task.getId()).append(",")
@@ -17,7 +18,7 @@ public class CSVFormatter {
                 .toString();
 
         if (task.getTypeTasks().equals(TypeTasks.SUBTASK)) {
-            result = result +  task.getEpicId();
+            result = result + task.getEpicId();
         }
 
         return result;
@@ -31,13 +32,13 @@ public class CSVFormatter {
         String description = taskLine[3];
         TaskStatus taskStatus = TaskStatus.valueOf(taskLine[4]);
 
-        if(type == TypeTasks.TASK) {
+        if (type == TypeTasks.TASK) {
             Task task = new Task(id, name, description, taskStatus, type);
             return task;
-        } else if(type == TypeTasks.EPIC) {
+        } else if (type == TypeTasks.EPIC) {
             Epic epic = new Epic(id, name, description, taskStatus, type);
             return epic;
-        } else if(type == TypeTasks.SUBTASK) {
+        } else if (type == TypeTasks.SUBTASK) {
             int epicId = Integer.valueOf(taskLine[5]);
             Subtask subtask = new Subtask(id, name, description, taskStatus, type, epicId);
             return subtask;

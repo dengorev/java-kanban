@@ -53,7 +53,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask createSubtask(Subtask subtask) {
-        if (subtask== null) {
+        if (subtask == null) {
             return null;
         }
         Epic epic = epicStorage.get(subtask.getEpicId());
