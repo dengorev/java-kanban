@@ -26,7 +26,7 @@ public class CSVFormatter {
 
     public static Task fromString(String value) {
         String[] taskLine = value.split(",");
-        int id = Integer.valueOf(taskLine[0]);
+        int id = Integer.parseInt(taskLine[0]);
         String name = taskLine[1];
         TypeTasks type = TypeTasks.valueOf(taskLine[2]);
         String description = taskLine[3];

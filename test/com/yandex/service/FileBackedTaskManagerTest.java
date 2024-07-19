@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class FileBackedTaskManagerTest {
     private static File file;
     private FileBackedTaskManager fileBackedTaskManager;
     private Task task1;
+    private static final int TITLE_FROM_FILE = 1;
 
     @BeforeEach
     void init() throws IOException {
@@ -22,30 +24,28 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    public void save_shouldSaveEmptyFile_whenCalled() {
+    public void save_shouldSaveEmptyFile_whenCalled() throws IOException {
         fileBackedTaskManager.createTask(null);
 
-        Assertions.assertEquals(38, file.length());
+        Assertions.assertEquals(Files.readAllLines(file.toPath()).size(),TITLE_FROM_FILE);
     }
 
     @Test
     public void load_shouldLoadEmptyFile_whenCalled() {
+        fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
         fileBackedTaskManager.createTask(null);
-        FileBackedTaskManager.loadFromFile(file);
 
-        Assertions.assertEquals(38, file.length());
+        Assertions.assertTrue(fileBackedTaskManager.taskStorage.isEmpty());
+        Assertions.assertTrue(fileBackedTaskManager.epicStorage.isEmpty());
+        Assertions.assertTrue(fileBackedTaskManager.subtaskStorage.isEmpty());
     }
 
     @Test
-    public void save_shouldSaveSomeTasks_whenCalled() {
+    public void save_shouldSaveSomeTasks_whenCalled() throws IOException {
+        fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
         fileBackedTaskManager.createTask(task1);
-        // 77 - длинна заголовка и 1 таски
-        Assertions.assertEquals(77, file.length());
 
-        Task task2 = new Task("zadacha2", "opisanieZadachi2");
-        fileBackedTaskManager.createTask(task2);
-        // 116 - длинна заголовка и 2 тасок
-        Assertions.assertEquals(116, file.length());
+        Assertions.assertEquals(Files.readAllLines(file.toPath()).size(), fileBackedTaskManager.getAllTask().size() + TITLE_FROM_FILE);
     }
 
     @Test

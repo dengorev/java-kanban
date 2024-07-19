@@ -23,23 +23,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-
-            if (!br.readLine().isBlank()) {
-                String line;
-                while ((line = br.readLine()) != null) {
-
-                    if (!line.isEmpty()) {
-                        Task task = CSVFormatter.fromString(line);
-                        if (task.getTypeTasks().equals(TypeTasks.TASK)) {
-                            fileBackedTaskManager.taskStorage.put(task.getId(), task);
-                            fileBackedTaskManager.createTask(task);
-                        } else if (task.getTypeTasks().equals(TypeTasks.EPIC)) {
-                            Epic epic = (Epic) task;
-                            fileBackedTaskManager.createEpic(epic);
-                        } else if (task.getTypeTasks().equals(TypeTasks.SUBTASK)) {
-                            Subtask subtask = (Subtask) task;
-                            fileBackedTaskManager.createSubtask(subtask);
-                        }
+            br.readLine();
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.isEmpty()) {
+                    Task task = CSVFormatter.fromString(line);
+                    if (task.getTypeTasks().equals(TypeTasks.TASK)) {
+                        fileBackedTaskManager.taskStorage.put(task.getId(), task);
+                        fileBackedTaskManager.createTask(task);
+                    } else if (task.getTypeTasks().equals(TypeTasks.EPIC)) {
+                        Epic epic = (Epic) task;
+                        fileBackedTaskManager.createEpic(epic);
+                    } else if (task.getTypeTasks().equals(TypeTasks.SUBTASK)) {
+                        Subtask subtask = (Subtask) task;
+                        fileBackedTaskManager.createSubtask(subtask);
                     }
                 }
             }
@@ -126,7 +123,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public Task getTaskById(int id) {
-         return super.getTaskById(id);
+        return super.getTaskById(id);
     }
 
     @Override
