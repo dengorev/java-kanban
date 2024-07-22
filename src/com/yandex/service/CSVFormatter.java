@@ -9,19 +9,18 @@ public class CSVFormatter {
     }
 
     public static String toString(Task task) {
-        String result = new StringBuilder()
+        StringBuilder result = new StringBuilder()
                 .append(task.getId()).append(",")
                 .append(task.getName()).append(",")
                 .append(task.getTypeTasks()).append(",")
                 .append(task.getDescription()).append(",")
-                .append(task.getStatus()).append(",")
-                .toString();
+                .append(task.getStatus());
 
         if (task.getTypeTasks().equals(TypeTasks.SUBTASK)) {
-            result = result + task.getEpicId();
+            result.append(",").append(task.getEpicId());
         }
 
-        return result;
+        return result.toString();
     }
 
     public static Task fromString(String value) {

@@ -6,14 +6,11 @@ import com.yandex.model.Task;
 import com.yandex.model.TypeTasks;
 
 import java.io.*;
-import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private static Path PATH_TO_FILE = Path.of("src/resources/tasks.csv");
-
-    private static File file = new File(String.valueOf(PATH_TO_FILE));
+    private final File file;
 
     public FileBackedTaskManager(File file) {
         this.file = file;
@@ -88,17 +85,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return createSubtask;
     }
 
-    @Override
     public ArrayList<Task> getAllTask() {
         return super.getAllTask();
     }
 
-    @Override
     public ArrayList<Epic> getAllEpic() {
         return super.getAllEpic();
     }
 
-    @Override
     public ArrayList<Subtask> getAllSubtask() {
         return super.getAllSubtask();
     }
@@ -121,22 +115,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    @Override
     public Task getTaskById(int id) {
         return super.getTaskById(id);
     }
 
-    @Override
     public Epic getEpicById(int id) {
         return super.getEpicById(id);
     }
 
-    @Override
     public Subtask getSubtaskById(int id) {
         return super.getSubtaskById(id);
     }
 
-    @Override
     public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
         return super.getSubtaskByEpicId(epicId);
     }
