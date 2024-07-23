@@ -229,4 +229,8 @@ public class InMemoryTaskManager implements TaskManager {
     private int idGenerator() {
         return ++idGenerated;
     }
+
+    public void setIdGenerated(int idGenerated) {
+        this.idGenerated = idGenerated;
+    }
 }
