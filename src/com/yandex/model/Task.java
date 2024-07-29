@@ -5,15 +5,33 @@ public class Task {
     protected String name;
     protected String description;
     protected TaskStatus status;
+    protected TypeTasks typeTasks;
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
+        this.typeTasks = TypeTasks.TASK;
+    }
+
+    public Task(int id, String name, String description, TaskStatus taskStatus, TypeTasks typeTasks) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = taskStatus;
+        this.typeTasks = typeTasks;
     }
 
     public int getId() {
         return id;
+    }
+
+    public Integer getEpicId() {
+        return null;
+    }
+
+    public TypeTasks getTypeTasks() {
+        return typeTasks;
     }
 
     public void setId(int id) {
