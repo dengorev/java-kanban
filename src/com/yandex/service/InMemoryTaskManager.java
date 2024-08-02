@@ -34,12 +34,12 @@ public class InMemoryTaskManager implements TaskManager {
 
         Integer result = prioritizedTasks.stream()
                 .map(currentTask -> {
-                    if (startDateTime.isBefore(currentTask.getEndDataTime()) && endDateTime.isBefore(currentTask.
-                            getStartDateTime())) {
+                    if (startDateTime.isBefore(currentTask.getEndDataTime()) && endDateTime.isBefore(currentTask
+                            .getStartDateTime())) {
                         return 1;
                     }
-                    if (startDateTime.isBefore(currentTask.getEndDataTime()) && endDateTime.isAfter(currentTask.
-                            getEndDataTime())) {
+                    if (startDateTime.isBefore(currentTask.getEndDataTime()) && endDateTime.isAfter(currentTask
+                            .getEndDataTime())) {
                         return 1;
                     }
                     return 0;
