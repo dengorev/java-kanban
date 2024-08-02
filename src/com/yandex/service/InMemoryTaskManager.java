@@ -1,14 +1,14 @@
 package com.yandex.service;
 
+import com.yandex.exception.TaskValidateException;
 import com.yandex.model.Epic;
 import com.yandex.model.Subtask;
 import com.yandex.model.Task;
 import com.yandex.model.TaskStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected final HistoryManager historyManager;
@@ -20,8 +20,36 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Task> taskStorage = new HashMap<>();
     protected final Map<Integer, Epic> epicStorage = new HashMap<>();
     protected final Map<Integer, Subtask> subtaskStorage = new HashMap<>();
+    protected Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartDateTime));
 
     private int idGenerated = 0;
+
+    public Set<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
+    }
+
+    private void validate(Task task) {
+        LocalDateTime startDateTime = task.getStartDateTime();
+        LocalDateTime endDateTime = task.getEndDataTime();
+
+        Integer result = prioritizedTasks.stream()
+                .map(currentTask -> {
+                    if (startDateTime.isBefore(currentTask.getEndDataTime()) && endDateTime.isBefore(currentTask.
+                            getStartDateTime())) {
+                        return 1;
+                    }
+                    if (startDateTime.isBefore(currentTask.getEndDataTime()) && endDateTime.isAfter(currentTask.
+                            getEndDataTime())) {
+                        return 1;
+                    }
+                    return 0;
+                })
+                .reduce(Integer::sum)
+                .orElse(0);
+        if (result > 0) {
+            throw new TaskValidateException("Задача пересекается");
+        }
+    }
 
     @Override
     public List<Task> getHistory() {
@@ -35,7 +63,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
         int id = idGenerator();
         task.setId(id);
+        validate(task);
         taskStorage.put(id, task);
+        prioritizedTasks.add(task);
         return task;
     }
 
@@ -56,11 +86,22 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask == null) {
             return null;
         }
+        int id = idGenerator();
+        subtask.setId(id);
         Epic epic = epicStorage.get(subtask.getEpicId());
         if (epic != null) {
-            int id = idGenerator();
-            subtask.setId(id);
+            if (epic.getStartDateTime() == null) {
+                epic.setStartDateTime(subtask.getStartDateTime());
+                epic.setDuration(subtask.getDuration());
+            } else if (subtask.getStartDateTime().isBefore(epic.getStartDateTime())) {
+                epic.setStartDateTime(subtask.getStartDateTime());
+                epic.addDuration(subtask.getDuration());
+            } else {
+                epic.addDuration(subtask.getDuration());
+            }
+            validate(subtask);
             subtaskStorage.put(id, subtask);
+            prioritizedTasks.add(subtask);
             epic.addSubtaskId(id);
             updateEpicStatus(epic);
             return subtask;
@@ -135,14 +176,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
-        ArrayList<Subtask> subtasks = new ArrayList<>();
-        for (Subtask subtask : subtaskStorage.values()) {
-            if (subtask.getEpicId() == epicId) {
-                subtasks.add(subtask);
-            }
-        }
-        return subtasks;
+    public List<Subtask> getSubtaskByEpicId(int epicId) {
+        return subtaskStorage.values().stream()
+                .filter(subtask -> epicId == subtask.getEpicId())
+                .collect(Collectors.toList());
     }
 
     @Override

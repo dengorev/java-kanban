@@ -1,5 +1,6 @@
 package com.yandex.service;
 
+import com.yandex.exception.ManagerSaveException;
 import com.yandex.model.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class FileBackedTaskManagerTest {
@@ -20,7 +23,7 @@ public class FileBackedTaskManagerTest {
     void init() throws IOException {
         file = File.createTempFile("test", ".csv", null);
         fileBackedTaskManager = Managers.getDefaultFileBackedTaskManager(file);
-        task1 = new Task("zadacha1", "opisanieZadachi1");
+        task1 = new Task("zadacha1", "opisanieZadachi1", LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60));
     }
 
     @Test
@@ -51,7 +54,7 @@ public class FileBackedTaskManagerTest {
     @Test
     public void load_shouldLoadSomeTasks_whenCalled() {
         fileBackedTaskManager.createTask(task1);
-        Task task2 = new Task("zadacha2", "opisanieZadachi2");
+        Task task2 = new Task("zadacha2", "opisanieZadachi2",  LocalDateTime.of(2024,1,5,15,2), Duration.ofMinutes(60));
         fileBackedTaskManager.createTask(task2);
         ArrayList<Task> beforeList = fileBackedTaskManager.getAllTask();
 
@@ -65,5 +68,13 @@ public class FileBackedTaskManagerTest {
         ArrayList<Task> afterList = fileBackedTaskManager1.getAllTask();
 
         Assertions.assertEquals(2, afterList.size());
+    }
+
+    @Test
+    void testManagerSaveException() {
+        ManagerSaveException exc = Assertions.assertThrows(ManagerSaveException.class, () -> {
+            FileBackedTaskManager.loadFromFile(new File("abc.csv"));
+        });
+        Assertions.assertEquals("Error occurred while loading", exc.getMessage());
     }
 }

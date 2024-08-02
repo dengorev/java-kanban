@@ -1,11 +1,15 @@
 package com.yandex.service;
 
+import com.yandex.exception.TaskValidateException;
 import com.yandex.model.Epic;
 import com.yandex.model.Subtask;
 import com.yandex.model.Task;
 import com.yandex.model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,7 +20,8 @@ class InMemoryTaskManagerTest {
 
     @BeforeEach
     void init() {
-        task = new Task("задача1", "описание1");
+        task = new Task("задача1", "описание1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60));
         epic = new Epic("эпик1", "описаниеЭпика1");
     }
 
@@ -34,7 +39,8 @@ class InMemoryTaskManagerTest {
     @Test
     void createSubtask_shouldCreateNewSubtask_whenCalled() {
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
         int subtaskId = subtask.getId();
@@ -59,7 +65,8 @@ class InMemoryTaskManagerTest {
     void addSubtaskId_shouldNotAddSubtaskInEpic_whenSubtaskIsEpic() {
         inMemoryTaskManager.createEpic(epic);
         epic.addSubtaskId(epic.getId());
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
 
         assertTrue(epic.getSubtasksId().isEmpty());
 
@@ -72,9 +79,11 @@ class InMemoryTaskManagerTest {
     @Test
     void createSubtask_shouldNotCreateSubtask_whenSubtaskEpicIdEqualSubtaskId() {
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
-        Subtask badSubtask = new Subtask("подзадача2", "описаниеПодзадачи2", subtask.getId());
+        Subtask badSubtask = new Subtask("подзадача2", "описаниеПодзадачи2",
+                LocalDateTime.of(2024,2,5,12,2), Duration.ofMinutes(60), subtask.getId());
         inMemoryTaskManager.createSubtask(badSubtask);
 
         assertEquals(1, inMemoryTaskManager.getAllSubtask().size());
@@ -110,7 +119,8 @@ class InMemoryTaskManagerTest {
     @Test
     void getSubtaskById_shouldReturnCreatedSubtask_whenSubtaskExist() {
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
         assertEquals(subtask, inMemoryTaskManager.getSubtaskById(2));
@@ -136,7 +146,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void createEpic_shouldCreateEpicWithoutChanges_whenCalled() {
-        inMemoryTaskManager.createTask(epic);
+        inMemoryTaskManager.createEpic(epic);
 
         assertEquals(1, epic.getId());
         assertEquals("эпик1", epic.getName());
@@ -147,7 +157,8 @@ class InMemoryTaskManagerTest {
     @Test
     void createSubtask_shouldCreateSubtaskWithoutChanges_whenCalled() {
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
         assertEquals(2, subtask.getId());
@@ -159,13 +170,15 @@ class InMemoryTaskManagerTest {
     @Test
     void createSubtask_shouldCreateSubtaskWithIdNotEqualsDeleted_whenCalled() {
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
         int taskId = subtask.getId();
         inMemoryTaskManager.removeSubtaskById(subtask.getId());
 
-        Subtask subtask2 = new Subtask("подзадача2", "описаниеПодзадачи2", epic.getId());
+        Subtask subtask2 = new Subtask("подзадача2", "описаниеПодзадачи2",
+                LocalDateTime.of(2024,2,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
         assertNotEquals(taskId, subtask2.getId());
@@ -174,9 +187,11 @@ class InMemoryTaskManagerTest {
     @Test
     void removeSubtaskById_shouldRemoveSubtaskIdFromEpicSubtasks_whenSubtaskIsExistAndSubtaskIsEpicSubtask() {
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
-        Subtask subtask2 = new Subtask("подзадача2", "описаниеПодзадачи2", epic.getId());
+        Subtask subtask2 = new Subtask("подзадача2", "описаниеПодзадачи2",
+                LocalDateTime.of(2024,2,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask2);
 
         assertEquals(subtask.getEpicId(), epic.getId());
@@ -192,7 +207,8 @@ class InMemoryTaskManagerTest {
     void setName_shouldChangeName_whenCalled() {
         inMemoryTaskManager.createTask(task);
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
         task.setName("задача5");
@@ -208,7 +224,8 @@ class InMemoryTaskManagerTest {
     void setDescription_shouldChangeName_whenCalled() {
         inMemoryTaskManager.createTask(task);
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
         task.setDescription("описание5");
@@ -224,7 +241,8 @@ class InMemoryTaskManagerTest {
     void setStatus_shouldChangeName_whenCalled() {
         inMemoryTaskManager.createTask(task);
         inMemoryTaskManager.createEpic(epic);
-        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1", epic.getId());
+        Subtask subtask = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic.getId());
         inMemoryTaskManager.createSubtask(subtask);
 
         task.setStatus(TaskStatus.IN_PROGRESS);
@@ -234,6 +252,56 @@ class InMemoryTaskManagerTest {
         assertEquals(TaskStatus.IN_PROGRESS, inMemoryTaskManager.getTaskById(task.getId()).getStatus());
         assertEquals(TaskStatus.IN_PROGRESS, inMemoryTaskManager.getEpicById(epic.getId()).getStatus());
         assertEquals(TaskStatus.IN_PROGRESS, inMemoryTaskManager.getSubtaskById(subtask.getId()).getStatus());
+    }
+
+    @Test
+    void updateSubtask_shouldCorrectlyDefineEpicStatus_whenUpdateSubtask() {
+        Epic epic2 = new Epic("Эпик2", "Описание эпика2");
+        inMemoryTaskManager.createEpic(epic2);
+        Subtask subtask1 = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic2.getId());
+        Subtask subtask2 = new Subtask("подзадача2", "описаниеПодзадачи2",
+                LocalDateTime.of(2024,2,5,12,2), Duration.ofMinutes(60), epic2.getId());
+        inMemoryTaskManager.createSubtask(subtask1);
+        inMemoryTaskManager.createSubtask(subtask2);
+
+        assertEquals(TaskStatus.NEW, subtask1.getStatus());
+        assertEquals(TaskStatus.NEW, subtask2.getStatus());
+        assertEquals(TaskStatus.NEW, epic.getStatus());
+        subtask2.setStatus(TaskStatus.DONE);
+        subtask1.setStatus(TaskStatus.DONE);
+        inMemoryTaskManager.updateSubtask(subtask1);
+        inMemoryTaskManager.updateSubtask(subtask2);
+
+        assertEquals(TaskStatus.DONE, epic2.getStatus());
+
+        subtask2.setStatus(TaskStatus.NEW);
+        subtask1.setStatus(TaskStatus.DONE);
+        inMemoryTaskManager.updateSubtask(subtask1);
+        inMemoryTaskManager.updateSubtask(subtask2);
+
+        assertEquals(TaskStatus.IN_PROGRESS, epic2.getStatus());
+
+        subtask2.setStatus(TaskStatus.IN_PROGRESS);
+        subtask1.setStatus(TaskStatus.IN_PROGRESS);
+        inMemoryTaskManager.updateSubtask(subtask1);
+        inMemoryTaskManager.updateSubtask(subtask2);
+
+        assertEquals(TaskStatus.IN_PROGRESS, epic2.getStatus());
+    }
+
+    @Test
+    void validate_shouldCorrectlyCalculateIntersectionOfIntervals_whenCreateSubtask() {
+        Epic epic2 = new Epic("Эпик2", "Описание эпика2");
+        inMemoryTaskManager.createEpic(epic2);
+        Subtask subtask1 = new Subtask("подзадача1", "описаниеПодзадачи1",
+                LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60), epic2.getId());
+        inMemoryTaskManager.createSubtask(subtask1);
+        Subtask subtask2 = new Subtask("подзадача2", "описаниеПодзадачи2",
+                LocalDateTime.of(2024,1,5,12,12), Duration.ofMinutes(60), epic2.getId());
+
+        TaskValidateException exc = assertThrows(TaskValidateException.class, () -> inMemoryTaskManager.createSubtask(subtask2));
+        assertEquals("Задача пересекается", exc.getMessage());
     }
 }
 

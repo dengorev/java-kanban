@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 class InMemoryHistoryManagerTest {
@@ -15,8 +17,8 @@ class InMemoryHistoryManagerTest {
 
     @BeforeEach
     void init() {
-        task = new Task("задача1", "описание1");
-        task2 = new Task("задача2", "описание2");
+        task = new Task("задача1", "описание1",  LocalDateTime.of(2024,1,5,12,2), Duration.ofMinutes(60));
+        task2 = new Task("задача2", "описание2",  LocalDateTime.of(2024,1,15,12,2), Duration.ofMinutes(60));
     }
 
     @Test
@@ -39,9 +41,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void remove_shouldRemoveTaskFromHistory_whenTaskExist() {
-        Task task3 = new Task("задача3", "описание3");
-        Task task4 = new Task("задача4", "описание4");
-        Task task5 = new Task("задача5", "описание5");
+        Task task3 = new Task("задача3", "описание3", LocalDateTime.of(2024,3,5,12,2), Duration.ofMinutes(60));
+        Task task4 = new Task("задача4", "описание4", LocalDateTime.of(2024,4,5,12,2), Duration.ofMinutes(60));
+        Task task5 = new Task("задача5", "описание5", LocalDateTime.of(2024,5,5,12,2), Duration.ofMinutes(60));
 
         inMemoryTaskManager.createTask(task);
         inMemoryTaskManager.createTask(task2);
@@ -64,6 +66,13 @@ class InMemoryHistoryManagerTest {
         Assertions.assertEquals(3, tasks.size());
         tasks.removeLast();
         Assertions.assertEquals(2, tasks.size());
+    }
+
+    @Test
+    void getHistory_shouldEmptyHistory_whenCalled() {
+        List<Task> tasks = inMemoryHistoryManager.getHistory();
+
+        Assertions.assertEquals(0, tasks.size());
     }
 
 }
