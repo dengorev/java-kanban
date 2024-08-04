@@ -6,8 +6,11 @@ import com.yandex.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
+
+    Set<Task> getPrioritizedTasks();
 
     Task createTask(Task task);
 
@@ -33,7 +36,7 @@ public interface TaskManager {
 
     Subtask getSubtaskById(int id);
 
-    ArrayList<Subtask> getSubtaskByEpicId(int epicId);
+    List<Subtask> getSubtaskByEpicId(int epicId);
 
     void removeTaskById(int id);
 
