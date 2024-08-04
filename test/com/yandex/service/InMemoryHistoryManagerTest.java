@@ -22,7 +22,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void add_shouldAddTasksInHistoryWithoutDuplicates_whenCalled() {
+    void shouldAddTasksInHistoryWithoutDuplicates() {
         inMemoryTaskManager.createTask(task);
         inMemoryTaskManager.createTask(task2);
 
@@ -40,7 +40,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void remove_shouldRemoveTaskFromHistory_whenTaskExist() {
+    void shouldRemoveTaskFromHistory() {
         Task task3 = new Task("задача3", "описание3", LocalDateTime.of(2024,3,5,12,2), Duration.ofMinutes(60));
         Task task4 = new Task("задача4", "описание4", LocalDateTime.of(2024,4,5,12,2), Duration.ofMinutes(60));
         Task task5 = new Task("задача5", "описание5", LocalDateTime.of(2024,5,5,12,2), Duration.ofMinutes(60));
@@ -69,7 +69,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void getHistory_shouldEmptyHistory_whenCalled() {
+    void shouldEmptyHistory() {
         List<Task> tasks = inMemoryHistoryManager.getHistory();
 
         Assertions.assertEquals(0, tasks.size());

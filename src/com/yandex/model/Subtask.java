@@ -19,6 +19,7 @@ public class Subtask extends Task {
         this.startDateTime = localDateTime;
         this.duration = duration;
         this.status = TaskStatus.NEW;
+        this.endTime = startDateTime.plusMinutes(duration.toMinutes());
     }
 
     public Subtask(int id, String name, String description, TaskStatus taskStatus, TypeTasks typeTasks, int epicId) {

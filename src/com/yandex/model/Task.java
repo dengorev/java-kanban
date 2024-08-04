@@ -47,10 +47,39 @@ public class Task {
         this.duration = duration;
         this.typeTasks = TypeTasks.TASK;
         this.status = TaskStatus.NEW;
+        this.endTime = startDateTime.plusMinutes(duration.toMinutes());
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getEndDataTime() {
-        return startDateTime.plusMinutes(duration.toMinutes());
+        return endTime;
     }
 
     public LocalDateTime getStartDateTime() {
@@ -69,44 +98,16 @@ public class Task {
         return null;
     }
 
-    public void setStartDateTime(LocalDateTime startDateTime) {
-        this.startDateTime = startDateTime;
-    }
-
-    public void setDuration(Duration duration) {
-        this.duration = duration;
-    }
-
     public TypeTasks getTypeTasks() {
         return typeTasks;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public TaskStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TaskStatus status) {
-        this.status = status;
     }
 
     @Override

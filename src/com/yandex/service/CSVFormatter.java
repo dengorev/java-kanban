@@ -18,7 +18,7 @@ public class CSVFormatter {
                 .append(task.getTypeTasks()).append(",")
                 .append(task.getDescription()).append(",")
                 .append(task.getStatus()).append(",")
-                .append(task.getStartDateTime().toString()).append(",")
+                .append(task.getStartDateTime()).append(",")
                 .append(task.getDuration().toMinutes()).append(",")
                 .append(task.getEndDataTime());
 

@@ -27,14 +27,14 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    public void save_shouldSaveEmptyFile_whenCalled() throws IOException {
+    public void shouldSaveEmptyFile() throws IOException {
         fileBackedTaskManager.createTask(null);
 
         Assertions.assertEquals(Files.readAllLines(file.toPath()).size(),TITLE_FROM_FILE);
     }
 
     @Test
-    public void load_shouldLoadEmptyFile_whenCalled() {
+    public void shouldLoadEmptyFile() {
         fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
         fileBackedTaskManager.createTask(null);
 
@@ -44,7 +44,7 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    public void save_shouldSaveSomeTasks_whenCalled() throws IOException {
+    public void shouldSaveSomeTasks() throws IOException {
         fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
         fileBackedTaskManager.createTask(task1);
 
@@ -52,7 +52,7 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    public void load_shouldLoadSomeTasks_whenCalled() {
+    public void shouldLoadSomeTasks() {
         fileBackedTaskManager.createTask(task1);
         Task task2 = new Task("zadacha2", "opisanieZadachi2",  LocalDateTime.of(2024,1,5,15,2), Duration.ofMinutes(60));
         fileBackedTaskManager.createTask(task2);

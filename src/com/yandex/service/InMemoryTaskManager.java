@@ -25,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
     private int idGenerated = 0;
 
     public Set<Task> getPrioritizedTasks() {
-        return prioritizedTasks;
+        return Set.copyOf(prioritizedTasks);
     }
 
     private void validate(Task task) {
@@ -40,6 +40,9 @@ public class InMemoryTaskManager implements TaskManager {
                     }
                     if (startDateTime.isBefore(currentTask.getEndDataTime()) && endDateTime.isAfter(currentTask
                             .getEndDataTime())) {
+                        return 1;
+                    }
+                    if (startDateTime.isEqual(currentTask.getStartDateTime()) && startDateTime.isEqual(currentTask.getEndDataTime())) {
                         return 1;
                     }
                     return 0;
