@@ -3,7 +3,7 @@ package com.yandex.model;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class Task {
+public class Task  {
     protected int id;
     protected String name;
     protected String description;
@@ -47,7 +47,6 @@ public class Task {
         this.duration = duration;
         this.typeTasks = TypeTasks.TASK;
         this.status = TaskStatus.NEW;
-        this.endTime = startDateTime.plusMinutes(duration.toMinutes());
     }
 
     public void setName(String name) {
@@ -56,6 +55,10 @@ public class Task {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public void setStartDateTime(LocalDateTime startDateTime) {
@@ -120,6 +123,7 @@ public class Task {
                 ", typeTasks=" + getTypeTasks() +
                 ", startDateTime=" + getStartDateTime() +
                 ", duration=" + getDuration() +
+                ", endDateTime=" + getEndDataTime() +
                 '}';
     }
 }
