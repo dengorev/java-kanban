@@ -2,7 +2,6 @@ package com.yandex.http;
 
 import com.sun.net.httpserver.HttpServer;
 import com.yandex.http.handler.*;
-import com.yandex.service.HistoryManager;
 import com.yandex.service.Managers;
 import com.yandex.service.TaskManager;
 
@@ -37,6 +36,4 @@ public class HttpTaskServer {
     public void stop() {
         httpServer.stop(0);
     }
-
-
 }
