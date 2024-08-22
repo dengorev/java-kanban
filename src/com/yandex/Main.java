@@ -1,6 +1,5 @@
 package com.yandex;
 
-import com.google.gson.Gson;
 import com.yandex.model.Epic;
 import com.yandex.model.Subtask;
 import com.yandex.model.Task;
