@@ -28,7 +28,7 @@ public class PrioritizedHttpHandler extends BaseHttpHandler {
             String historyJson = gson.toJson(history);
             sendText(exchange, historyJson, 200);
         } else {
-            sendError500(exchange);
+            sendError500(exchange, "Недопустимый метод");
         }
     }
 

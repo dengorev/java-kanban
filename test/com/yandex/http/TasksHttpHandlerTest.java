@@ -29,6 +29,7 @@ public class TasksHttpHandlerTest {
     TaskManager taskManager;
     HttpTaskServer taskServer;
     Gson gson;
+    Task task;
 
     public TasksHttpHandlerTest() {
     }
@@ -50,6 +51,9 @@ public class TasksHttpHandlerTest {
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, localTimeTypeAdapter);
         gsonBuilder.registerTypeAdapter(Duration.class, durationAdapter);
         gson = gsonBuilder.create();
+
+        task = new Task("task1", "description1", LocalDateTime.of(2023,1,5,
+                12,2), Duration.ofMinutes(5));
     }
 
     @AfterEach
@@ -59,7 +63,6 @@ public class TasksHttpHandlerTest {
 
     @Test
     public void shouldCreateTask() throws IOException, InterruptedException {
-        Task task = new Task("task1", "description1", LocalDateTime.now(), Duration.ofMinutes(5));
         String taskJson = gson.toJson(task);
 
         HttpClient client = HttpClient.newHttpClient();
@@ -81,8 +84,6 @@ public class TasksHttpHandlerTest {
 
     @Test
     public void shouldGetTasks() throws IOException, InterruptedException {
-        Task task = new Task("task1", "description1", LocalDateTime.of(2023,1,5,
-                12,2), Duration.ofMinutes(5));
         Task task2 = new Task("task2", "description2", LocalDateTime.of(2024,1,5,
                 12,2), Duration.ofMinutes(5));
         taskManager.createTask(task);
@@ -103,8 +104,6 @@ public class TasksHttpHandlerTest {
 
     @Test
     public void shouldDeleteTask() throws IOException, InterruptedException {
-        Task task = new Task("task1", "description1", LocalDateTime.of(2023,1,5,
-                12,2), Duration.ofMinutes(5));
         taskManager.createTask(task);
 
         HttpClient client = HttpClient.newHttpClient();

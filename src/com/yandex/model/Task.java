@@ -3,7 +3,7 @@ package com.yandex.model;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class Task  {
+public class Task {
     protected int id;
     protected String name;
     protected String description;

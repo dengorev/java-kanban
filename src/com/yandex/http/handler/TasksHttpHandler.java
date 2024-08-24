@@ -3,7 +3,7 @@ package com.yandex.http.handler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
-import com.yandex.exception.DurationException;
+import com.yandex.exception.TaskValidateException;
 import com.yandex.http.adapter.DurationAdapter;
 import com.yandex.http.adapter.LocalDateTimeAdapter;
 import com.yandex.model.Task;
@@ -39,7 +39,7 @@ public class TasksHttpHandler extends BaseHttpHandler {
                 handleDelete(exchange);
                 break;
             default:
-                sendError500(exchange);
+                sendError500(exchange, "Недопустимый метод");
         }
     }
 
@@ -48,17 +48,17 @@ public class TasksHttpHandler extends BaseHttpHandler {
             String path = exchange.getRequestURI().getPath();
             String[] pathParts = path.split("/");
             int id = Integer.parseInt(pathParts[2]);
-            Task task2 = taskManager.getTaskById(id);
+            Task task = taskManager.getTaskById(id);
 
-            if (task2 != null) {
+            if (task != null) {
                 taskManager.removeTaskById(id);
                 String response = "Задача удалена";
                 sendText(exchange, response, 200);
             } else {
-                sendError404(exchange);
+                sendError404(exchange, "Не найдена задача");
             }
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 
@@ -70,35 +70,35 @@ public class TasksHttpHandler extends BaseHttpHandler {
 
             InputStream inputStream = exchange.getRequestBody();
             String taskJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            if (taskJson.isEmpty()) {
+                return;
+            }
             Gson gson = getGson();
             Task task = gson.fromJson(taskJson, Task.class);
+
             if (pathLength == 3) {
                 String idStr = pathParts[2];
-                try {
-                    int id = Integer.parseInt(idStr);
-                    Task task2 = taskManager.getTaskById(id);
-                    if (task2 != null) {
-                        taskManager.updateTask(task2);
-                        String response = gson.toJson(task2);
-                        sendText(exchange, response, 201);
-                    } else {
-                        sendError404(exchange);
-                    }
-                } catch (DurationException e) {
-                    sendError406(exchange);
-                } catch (NoSuchElementException e) {
-                    sendError404(exchange);
+                int id = Integer.parseInt(idStr);
+                Task task2 = taskManager.getTaskById(id);
+                if (task2 != null) {
+                    taskManager.updateTask(task2);
+                    String response = gson.toJson(task2);
+                    sendText(exchange, response, 201);
+                } else {
+                    sendError404(exchange, "Несуществующая задача");
                 }
             } else if (pathParts.length == 2) {
                 taskManager.createTask(task);
                 String response = gson.toJson(task);
                 sendText(exchange, response, 201);
-            } else {
-                sendError406(exchange);
             }
             exchange.getResponseBody().close();
+        } catch (TaskValidateException e) {
+            sendError406(exchange, e.getMessage());
+        } catch (NoSuchElementException e) {
+            sendError404(exchange, e.getMessage());
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 
@@ -121,11 +121,11 @@ public class TasksHttpHandler extends BaseHttpHandler {
                     String response = gson.toJson(task);
                     sendText(exchange, response, 200);
                 } else {
-                    sendError404(exchange);
+                    sendError404(exchange, "Несуществующая задача");
                 }
             }
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 

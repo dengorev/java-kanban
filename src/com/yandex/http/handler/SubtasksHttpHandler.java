@@ -3,7 +3,7 @@ package com.yandex.http.handler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
-import com.yandex.exception.DurationException;
+import com.yandex.exception.TaskValidateException;
 import com.yandex.http.adapter.DurationAdapter;
 import com.yandex.http.adapter.LocalDateTimeAdapter;
 import com.yandex.model.Subtask;
@@ -37,7 +37,7 @@ public class SubtasksHttpHandler extends BaseHttpHandler {
                 handleDelete(exchange);
                 break;
             default:
-                sendError500(exchange);
+                sendError500(exchange, "Недопустимый метод");
         }
     }
 
@@ -52,10 +52,10 @@ public class SubtasksHttpHandler extends BaseHttpHandler {
                 String response = "Подзадача удалена";
                 sendText(exchange, response, 200);
             } else {
-                sendError404(exchange);
+                sendError404(exchange, "Не найдена подзадача");
             }
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 
@@ -67,30 +67,31 @@ public class SubtasksHttpHandler extends BaseHttpHandler {
 
             InputStream requestBody = exchange.getRequestBody();
             String requestBodyStr = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
+            if (requestBodyStr.isEmpty()) {
+                return;
+            }
             Gson gson = getGson();
             Subtask subtask = gson.fromJson(requestBodyStr, Subtask.class);
 
             if (pathLength == 3) {
-                try {
-                    if (subtask != null) {
-                        taskManager.updateSubtask(subtask);
-                        sendText(exchange, subtask.toString(), 201);
-                    } else {
-                        sendError404(exchange);
-                    }
-                } catch (DurationException e) {
-                    sendError406(exchange);
-                } catch (NoSuchElementException e) {
-                    sendError404(exchange);
+                if (subtask != null) {
+                    taskManager.updateSubtask(subtask);
+                    String response = gson.toJson(subtask);
+                    sendText(exchange, response, 201);
+                } else {
+                    sendError404(exchange, "Несуществующая подзадача");
                 }
             } else if (pathLength == 2) {
                 taskManager.createSubtask(subtask);
-                sendText(exchange, subtask.toString(), 201);
-            } else {
-                sendError406(exchange);
+                String response = gson.toJson(subtask);
+                sendText(exchange, response, 201);
             }
+        } catch (TaskValidateException e) {
+            sendError406(exchange, e.getMessage());
+        } catch (NoSuchElementException e) {
+            sendError404(exchange, e.getMessage());
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 
@@ -111,11 +112,11 @@ public class SubtasksHttpHandler extends BaseHttpHandler {
                 if (subtask != null) {
                     sendText(exchange, response, 200);
                 } else {
-                    sendError404(exchange);
+                    sendError404(exchange, "Несуществующая подзадача");
                 }
             }
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 

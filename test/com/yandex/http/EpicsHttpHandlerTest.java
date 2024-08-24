@@ -32,6 +32,7 @@ public class EpicsHttpHandlerTest {
     TaskManager taskManager;
     HttpTaskServer taskServer;
     Gson gson;
+    Epic epic;
 
     public EpicsHttpHandlerTest() {
     }
@@ -53,6 +54,8 @@ public class EpicsHttpHandlerTest {
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, localTimeTypeAdapter);
         gsonBuilder.registerTypeAdapter(Duration.class, durationAdapter);
         gson = gsonBuilder.create();
+
+        epic = new Epic("epic1", "description1");
     }
 
     @AfterEach
@@ -62,7 +65,6 @@ public class EpicsHttpHandlerTest {
 
     @Test
     public void shouldCreateEpic() throws IOException, InterruptedException {
-        Epic epic = new Epic("epic1", "description1");
         String epicJson = gson.toJson(epic);
 
         HttpClient client = HttpClient.newHttpClient();
@@ -84,9 +86,8 @@ public class EpicsHttpHandlerTest {
 
     @Test
     public void shouldGetEpic() throws IOException, InterruptedException {
-        Epic epic1 = new Epic("epic1", "description1");
         Epic epic2 = new Epic("epic2", "description2");
-        taskManager.createEpic(epic1);
+        taskManager.createEpic(epic);
         taskManager.createEpic(epic2);
 
         HttpClient client = HttpClient.newHttpClient();
@@ -104,7 +105,6 @@ public class EpicsHttpHandlerTest {
 
     @Test
     public void shouldDeleteEpic() throws IOException, InterruptedException {
-        Epic epic = new Epic("epic1", "description1");
         Subtask subtask = new Subtask("subtask1", "description1", LocalDateTime.of(2024,1,5,
                 12,2), Duration.ofMinutes(5), 1);
         taskManager.createEpic(epic);

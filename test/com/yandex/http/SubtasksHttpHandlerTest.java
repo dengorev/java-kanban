@@ -30,6 +30,8 @@ public class SubtasksHttpHandlerTest {
     TaskManager taskManager;
     HttpTaskServer taskServer;
     Gson gson;
+    Epic epic;
+    Subtask subtask;
 
     public SubtasksHttpHandlerTest() {
     }
@@ -51,6 +53,10 @@ public class SubtasksHttpHandlerTest {
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, localTimeTypeAdapter);
         gsonBuilder.registerTypeAdapter(Duration.class, durationAdapter);
         gson = gsonBuilder.create();
+
+        epic = new Epic("epic1", "description1");
+        subtask = new Subtask("subtask1", "description1", LocalDateTime.of(2024,1,5,
+                12,2), Duration.ofMinutes(5), 1);
     }
 
     @AfterEach
@@ -60,9 +66,6 @@ public class SubtasksHttpHandlerTest {
 
     @Test
     public void shouldCreateSubtask() throws IOException, InterruptedException {
-        Epic epic = new Epic("epic1", "description1");
-        Subtask subtask = new Subtask("subtask1", "description1", LocalDateTime.of(2024,1,5,
-                12,2), Duration.ofMinutes(5), 1);
         taskManager.createEpic(epic);
         String epicJson = gson.toJson(subtask);
 
@@ -85,13 +88,10 @@ public class SubtasksHttpHandlerTest {
 
     @Test
     public void shouldGetSubtask() throws IOException, InterruptedException {
-        Epic epic = new Epic("epic1", "description1");
-        Subtask subtask1 = new Subtask("subtask1", "description1", LocalDateTime.of(2023,1,5,
-                10,2), Duration.ofMinutes(5), 1);
         Subtask subtask2 = new Subtask("subtask2", "description1", LocalDateTime.of(2024,1,5,
                 12,2), Duration.ofMinutes(5), 1);
         taskManager.createEpic(epic);
-        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask);
         taskManager.createSubtask(subtask2);
 
         HttpClient client = HttpClient.newHttpClient();
@@ -109,9 +109,6 @@ public class SubtasksHttpHandlerTest {
 
     @Test
     public void shouldDeleteSubtasks() throws IOException, InterruptedException {
-        Epic epic = new Epic("epic1", "description1");
-        Subtask subtask = new Subtask("epic1", "description1", LocalDateTime.of(2024,1,5,
-                12,2), Duration.ofMinutes(5), 1);
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask);
 

@@ -15,15 +15,15 @@ public abstract class BaseHttpHandler implements HttpHandler {
         h.close();
     }
 
-    protected void sendError500(HttpExchange exchange) throws IOException {
-        sendText(exchange, "Internal Server Error", 500);
+    protected void sendError500(HttpExchange exchange, String message) throws IOException {
+        sendText(exchange, message, 500);
     }
 
-    protected void sendError404(HttpExchange exchange) throws IOException {
-        sendText(exchange, "Not Found", 404);
+    protected void sendError404(HttpExchange exchange, String message) throws IOException {
+        sendText(exchange, message, 404);
     }
 
-    protected void sendError406(HttpExchange exchange) throws IOException {
-        sendText(exchange, "Not Acceptable", 406);
+    protected void sendError406(HttpExchange exchange, String message) throws IOException {
+        sendText(exchange, message, 406);
     }
 }

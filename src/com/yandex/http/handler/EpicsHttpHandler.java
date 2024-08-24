@@ -3,7 +3,7 @@ package com.yandex.http.handler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
-import com.yandex.exception.DurationException;
+import com.yandex.exception.TaskValidateException;
 import com.yandex.http.adapter.DurationAdapter;
 import com.yandex.http.adapter.LocalDateTimeAdapter;
 import com.yandex.model.Epic;
@@ -38,7 +38,7 @@ public class EpicsHttpHandler extends BaseHttpHandler {
                 handleDelete(exchange);
                 break;
             default:
-                sendError500(exchange);
+                sendError500(exchange, "Недопустимый метод");
         }
     }
 
@@ -54,10 +54,10 @@ public class EpicsHttpHandler extends BaseHttpHandler {
                 String response = "Епик удален";
                 sendText(exchange, response, 200);
             } else {
-                sendError404(exchange);
+                sendError404(exchange, "Не найден епик");
             }
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 
@@ -69,33 +69,32 @@ public class EpicsHttpHandler extends BaseHttpHandler {
 
             InputStream requestBody = exchange.getRequestBody();
             String requestBodyStr = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
+            if (requestBodyStr.isEmpty()) {
+                return;
+            }
             Gson gson = getGson();
             Epic epic = gson.fromJson(requestBodyStr, Epic.class);
 
             if (pathLength == 3) {
-                try {
-                    if (epic != null) {
-                        taskManager.updateEpic(epic);
-                        String response = gson.toJson(epic);
-                        sendText(exchange, response, 201);
-                    } else {
-                        sendError404(exchange);
-                    }
-                } catch (DurationException e) {
-                    sendError406(exchange);
-                } catch (NoSuchElementException e) {
-                    sendError404(exchange);
+                if (epic != null) {
+                    taskManager.updateEpic(epic);
+                    String response = gson.toJson(epic);
+                    sendText(exchange, response, 201);
+                } else {
+                    sendError404(exchange, "Несуществующий епик");
                 }
             } else if (pathParts.length == 2) {
                 taskManager.createEpic(epic);
                 String response = gson.toJson(epic);
                 sendText(exchange, response, 201);
-            } else {
-                sendError406(exchange);
             }
             exchange.getResponseBody().close();
+        } catch (TaskValidateException e) {
+            sendError406(exchange, e.getMessage());
+        } catch (NoSuchElementException e) {
+            sendError404(exchange, e.getMessage());
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 
@@ -117,7 +116,7 @@ public class EpicsHttpHandler extends BaseHttpHandler {
                 if (epic != null) {
                     sendText(exchange, response, 200);
                 } else {
-                    sendError404(exchange);
+                    sendError404(exchange, "Несуществующий епик");
                 }
             } else {
                 int id = Integer.parseInt(pathParts[2]);
@@ -126,11 +125,11 @@ public class EpicsHttpHandler extends BaseHttpHandler {
                 if (subtasks != null) {
                     sendText(exchange, response, 200);
                 } else {
-                    sendError404(exchange);
+                    sendError404(exchange, "Несуществующая подзадача");
                 }
             }
         } catch (Exception e) {
-            sendError500(exchange);
+            sendError500(exchange, e.getMessage());
         }
     }
 
