@@ -20,7 +20,18 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Task> taskStorage = new HashMap<>();
     protected final Map<Integer, Epic> epicStorage = new HashMap<>();
     protected final Map<Integer, Subtask> subtaskStorage = new HashMap<>();
-    protected Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartDateTime));
+    protected Set<Task> prioritizedTasks = new TreeSet<>((task1, task2) -> {
+        if (task1.getStartDateTime() == null && task2.getStartDateTime() == null) {
+            return Integer.compare(task1.getId(), task2.getId());
+        }
+        if (task1.getStartDateTime() == null) {
+            return 1;
+        }
+        if (task2.getStartDateTime() == null) {
+            return -1;
+        }
+        return task1.getStartDateTime().compareTo(task2.getStartDateTime());
+    });
 
     private int idGenerated = 0;
 
@@ -66,6 +77,8 @@ public class InMemoryTaskManager implements TaskManager {
         }
         int id = idGenerator();
         task.setId(id);
+        LocalDateTime endTime = task.getStartDateTime().plus(task.getDuration());
+        task.setEndTime(endTime);
         validate(task);
         taskStorage.put(id, task);
         prioritizedTasks.add(task);
@@ -96,12 +109,20 @@ public class InMemoryTaskManager implements TaskManager {
             if (epic.getStartDateTime() == null) {
                 epic.setStartDateTime(subtask.getStartDateTime());
                 epic.setDuration(subtask.getDuration());
+                LocalDateTime endTime = subtask.getStartDateTime().plus(subtask.getDuration());
+                epic.setEndTime(endTime);
             } else if (subtask.getStartDateTime().isBefore(epic.getStartDateTime())) {
                 epic.setStartDateTime(subtask.getStartDateTime());
                 epic.addDuration(subtask.getDuration());
+                LocalDateTime endTime = subtask.getStartDateTime().plus(subtask.getDuration());
+                epic.setEndTime(endTime);
             } else {
                 epic.addDuration(subtask.getDuration());
+                LocalDateTime endTime = subtask.getStartDateTime().plus(subtask.getDuration());
+                epic.setEndTime(endTime);
             }
+            LocalDateTime endTime = subtask.getStartDateTime().plus(subtask.getDuration());
+            subtask.setEndTime(endTime);
             validate(subtask);
             subtaskStorage.put(id, subtask);
             prioritizedTasks.add(subtask);
@@ -240,7 +261,7 @@ public class InMemoryTaskManager implements TaskManager {
         boolean isDone = false;
         boolean isNew = false;
 
-        if (epic.getSubtasksId().isEmpty()) {
+        if (epic.getSubtasksId() == null || epic.getSubtasksId().isEmpty()) {
             epic.setStatus(TaskStatus.NEW);
             return;
         }
